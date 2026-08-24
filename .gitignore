@@ -1,0 +1,20 @@
+# Firebase
+**/google-services.json
+**/GoogleService-Info.plist
+**/firebase-adminsdk*.json
+**/client_secret*.json
+
+# Backend binary & env
+backend/senior-care-server
+backend/.env
+
+# Flutter build
+**/build/
+**/.dart_tool/
+**/.flutter-plugins
+**/.flutter-plugins-dependencies
+**/pubspec.lock
+
+# Misc
+.DS_Store
+*.pem
