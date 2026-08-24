@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "479885785074",
+    "project_id": "seniorcareapp-cce63",
+    "storage_bucket": "seniorcareapp-cce63.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:479885785074:android:0492e9ffef05c3abbd5d6b",
+        "android_client_info": {
+          "package_name": "com.smartcare.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDhb8-hMmxrq34V2Nbj8J2C8hW0hk-pk74"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
