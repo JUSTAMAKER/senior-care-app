@@ -28,7 +28,7 @@ ELDER_NAME     = os.getenv("ELDER_NAME", "어르신")
 MQTT_TOPIC_FALL   = "senior_care/fall"
 MQTT_TOPIC_STATUS = "senior_care/robot_status"   # 로봇 응답 결과 앱으로 전송
 
-LISTEN_TIMEOUT    = 7   # 낙상 후 응답 대기 시간 (초)
+LISTEN_TIMEOUT    = 3   # 낙상 후 응답 대기 시간 (초)
 CONFIRM_WAIT      = 3   # TTS 재생 후 응답 대기 전 여유 시간 (초)
 
 openai.api_key = OPENAI_API_KEY
@@ -213,7 +213,7 @@ def conversation_loop() -> None:
                 time.sleep(0.5)
                 continue
 
-        user_input = listen(timeout=10)
+        user_input = listen(timeout=3)
 
         if user_input is None:
             continue
