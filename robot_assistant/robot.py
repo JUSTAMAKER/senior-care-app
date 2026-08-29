@@ -14,7 +14,7 @@ import subprocess
 import paho.mqtt.client as mqtt
 import speech_recognition as sr
 from gtts import gTTS
-from openai import OpenAI
+import openai
 
 # ============================================================
 # 설정
@@ -31,7 +31,7 @@ MQTT_TOPIC_STATUS = "senior_care/robot_status"   # 로봇 응답 결과 앱으�
 LISTEN_TIMEOUT    = 7   # 낙상 후 응답 대기 시간 (초)
 CONFIRM_WAIT      = 3   # TTS 재생 후 응답 대기 전 여유 시간 (초)
 
-client = OpenAI(api_key=OPENAI_API_KEY)
+openai.api_key = OPENAI_API_KEY
 
 # 대화 기록 (일상 대화용)
 conversation_history: list[dict] = [
@@ -101,13 +101,13 @@ def listen(timeout: int = LISTEN_TIMEOUT) -> str | None:
 def chat(user_message: str) -> str:
     conversation_history.append({"role": "user", "content": user_message})
     try:
-        response = client.chat.completions.create(
-            model="gpt-4o-mini",
+        response = openai.ChatCompletion.create(
+            model="gpt-3.5-turbo",
             messages=conversation_history,
             max_tokens=150,
             temperature=0.7,
         )
-        reply = response.choices[0].message.content.strip()
+        reply = response.choices[0].message["content"].strip()
         conversation_history.append({"role": "assistant", "content": reply})
         return reply
     except Exception as e:
