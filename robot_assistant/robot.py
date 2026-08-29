@@ -34,7 +34,7 @@ CONFIRM_WAIT      = 3   # TTS 재생 후 응답 대기 전 여유 시간 (초)
 openai.api_key = OPENAI_API_KEY
 
 # 대화 기록 (일상 대화용)
-conversation_history: list[dict] = [
+conversation_history = [
     {
         "role": "system",
         "content": (
@@ -71,7 +71,7 @@ def speak(text: str) -> None:
 # STT
 # ============================================================
 
-def listen(timeout: int = LISTEN_TIMEOUT) -> str | None:
+def listen(timeout: int = LISTEN_TIMEOUT):
     recognizer = sr.Recognizer()
     with sr.Microphone() as source:
         recognizer.adjust_for_ambient_noise(source, duration=0.5)
