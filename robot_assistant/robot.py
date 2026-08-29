@@ -76,7 +76,7 @@ def listen(timeout: int = LISTEN_TIMEOUT):
     mic_index = None
     for i, name in enumerate(sr.Microphone.list_microphone_names()):
         print(f"[MIC] {i}: {name}")
-        if any(k in name for k in ['ReSpeaker', 'USB', 'UAC', 'Array']):
+        if any(k in name for k in ['ReSpeaker', 'USB', 'UAC', 'Array', 'UACDemo']):
             mic_index = i
             break
     print(f"[MIC] 선택된 인덱스: {mic_index}")
