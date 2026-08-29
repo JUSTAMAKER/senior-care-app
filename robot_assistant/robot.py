@@ -61,7 +61,7 @@ def speak(text: str) -> None:
         with tempfile.NamedTemporaryFile(suffix=".mp3", delete=False) as f:
             tmp_path = f.name
         tts.save(tmp_path)
-        subprocess.run(["mpg123", "-q", tmp_path], check=True)
+        subprocess.run(["mpg123", "-q", "-a", "hw:UACDemoV10", tmp_path], check=True)
         os.remove(tmp_path)
     except Exception as e:
         print(f"[TTS] 오류: {e}")
