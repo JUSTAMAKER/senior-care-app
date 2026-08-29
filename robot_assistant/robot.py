@@ -73,7 +73,12 @@ def speak(text: str) -> None:
 
 def listen(timeout: int = LISTEN_TIMEOUT):
     recognizer = sr.Recognizer()
-    with sr.Microphone() as source:
+    mic_index = None
+    for i, name in enumerate(sr.Microphone.list_microphone_names()):
+        if 'ReSpeaker' in name or 'USB' in name:
+            mic_index = i
+            break
+    with sr.Microphone(device_index=mic_index) as source:
         recognizer.adjust_for_ambient_noise(source, duration=0.5)
         print(f"[STT] 듣는 중... ({timeout}초)")
         try:
