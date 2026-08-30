@@ -25,7 +25,7 @@ MQTT_BROKER    = os.getenv("MQTT_BROKER", "13.238.255.200")
 MQTT_PORT      = int(os.getenv("MQTT_PORT", "1883"))
 ELDER_NAME     = os.getenv("ELDER_NAME", "어르신")
 
-MQTT_TOPIC_FALL   = "senior_care/fall"
+MQTT_TOPIC_ACTION = "senior_care/action"
 MQTT_TOPIC_STATUS = "senior_care/robot_status"   # 로봇 응답 결과 앱으로 전송
 
 LISTEN_TIMEOUT    = 3   # 낙상 후 응답 대기 시간 (초)
@@ -172,15 +172,24 @@ def handle_fall(mqtt_client_ref: mqtt.Client) -> None:
 # MQTT
 # ============================================================
 
-def on_fall_message(client_ref, userdata, message):
+def on_action_message(client_ref, userdata, message):
     global is_handling_fall
+
+    try:
+        data = json.loads(message.payload.decode())
+        action = data.get("action", "")
+    except Exception:
+        return
+
+    if action not in ("Fall Down", "Lying Down"):
+        return
 
     with fall_lock:
         if is_handling_fall:
             return
         is_handling_fall = True
 
-    print(f"[MQTT] 낙상 이벤트 수신")
+    print(f"[MQTT] 낙상 이벤트 수신: {action}")
     threading.Thread(
         target=handle_fall,
         args=(client_ref,),
@@ -192,9 +201,9 @@ def setup_mqtt() -> mqtt.Client:
     mqtt_client = mqtt.Client()
     mqtt_client.on_connect = lambda c, u, f, rc: (
         print(f"[MQTT] 연결: {rc}"),
-        c.subscribe(MQTT_TOPIC_FALL),
+        c.subscribe(MQTT_TOPIC_ACTION),
     )
-    mqtt_client.message_callback_add(MQTT_TOPIC_FALL, on_fall_message)
+    mqtt_client.message_callback_add(MQTT_TOPIC_ACTION, on_action_message)
     mqtt_client.connect(MQTT_BROKER, MQTT_PORT, keepalive=60)
     mqtt_client.loop_start()
     return mqtt_client
