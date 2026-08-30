@@ -214,9 +214,18 @@ def conversation_loop() -> None:
                 time.sleep(0.5)
                 continue
 
-        user_input = listen(timeout=3)
+        # 낙상 처리 중이면 listen 자체를 건너뜀
+        if is_handling_fall:
+            time.sleep(0.5)
+            continue
+
+        user_input = listen(timeout=1)
 
         if user_input is None:
+            continue
+
+        # listen 끝난 후에도 낙상 처리 중이면 입력 무시
+        if is_handling_fall:
             continue
 
         reply = chat(user_input)
