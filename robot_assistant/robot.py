@@ -73,7 +73,7 @@ def speak(text: str) -> None:
 
 def listen(timeout: int = LISTEN_TIMEOUT):
     recognizer = sr.Recognizer()
-    mic_index = 25
+    mic_index = 0
     with sr.Microphone(device_index=mic_index) as source:
         recognizer.adjust_for_ambient_noise(source, duration=0.5)
         print(f"[STT] 듣는 중... ({timeout}초)")
