@@ -201,11 +201,19 @@ def on_action_message(client_ref, userdata, message):
 
 def setup_mqtt() -> mqtt.Client:
     mqtt_client = mqtt.Client()
-    mqtt_client.on_connect = lambda c, u, f, rc: (
-        print(f"[MQTT] 연결: {rc}"),
-        c.subscribe(MQTT_TOPIC_ACTION),
-    )
-    mqtt_client.message_callback_add(MQTT_TOPIC_ACTION, on_action_message)
+
+    def on_connect(c, u, f, rc):
+        print(f"[MQTT] 연결: {rc}")
+        c.subscribe(MQTT_TOPIC_ACTION)
+        print(f"[MQTT] 구독: {MQTT_TOPIC_ACTION}")
+
+    def on_message(c, u, msg):
+        print(f"[MQTT] 메시지 수신: {msg.topic} {msg.payload.decode()[:80]}")
+        if msg.topic == MQTT_TOPIC_ACTION:
+            on_action_message(c, u, msg)
+
+    mqtt_client.on_connect = on_connect
+    mqtt_client.on_message = on_message
     mqtt_client.connect(MQTT_BROKER, MQTT_PORT, keepalive=60)
     mqtt_client.loop_start()
     return mqtt_client
