@@ -184,9 +184,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   Widget _buildStatusCard() {
-    // 미확인 이벤트 중 가장 최근 것으로 상태 결정
+    // 실시간 MQTT action이 낙상이면 즉시 반영, 아니면 DB 이벤트 기반
+    final bool mqttFall = _currentAction == 'FALL' || _currentAction == 'Fall Down' || _currentAction == 'Fall';
     final unresolved = _recentEvents.where((e) => e['resolved'] == false).toList();
-    final latestType = unresolved.isNotEmpty ? unresolved.first['event_type'] as String? : null;
+    final latestType = mqttFall
+        ? 'fall_detected'
+        : (unresolved.isNotEmpty ? unresolved.first['event_type'] as String? : null);
 
     final Color dotColor;
     final Color bgColor;
@@ -352,17 +355,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
         children: [
           Expanded(
             child: _infoCard(
-              icon: _currentAction == 'Fall Down'
+              icon: (_currentAction == 'Fall Down' || _currentAction == 'FALL' || _currentAction == 'Fall')
                   ? Icons.warning_amber_rounded
                   : _currentAction == 'Lying Down'
                       ? Icons.access_time_rounded
                       : Icons.directions_walk,
-              iconBg: _currentAction == 'Fall Down'
+              iconBg: (_currentAction == 'Fall Down' || _currentAction == 'FALL' || _currentAction == 'Fall')
                   ? const Color(0xFFfdf0f0)
                   : _currentAction == 'Lying Down'
                       ? const Color(0xFFfff4e8)
                       : const Color(0xFFe8f5ee),
-              iconColor: _currentAction == 'Fall Down'
+              iconColor: (_currentAction == 'Fall Down' || _currentAction == 'FALL' || _currentAction == 'Fall')
                   ? const Color(0xFFe05c5c)
                   : _currentAction == 'Lying Down'
                       ? const Color(0xFFe8942a)

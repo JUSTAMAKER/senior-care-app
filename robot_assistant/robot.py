@@ -11,6 +11,7 @@ import threading
 import tempfile
 import subprocess
 
+import urllib.request
 import paho.mqtt.client as mqtt
 import speech_recognition as sr
 from gtts import gTTS
@@ -27,6 +28,8 @@ ELDER_NAME     = os.getenv("ELDER_NAME", "어르신")
 
 MQTT_TOPIC_ACTION = "senior_care/action"
 MQTT_TOPIC_STATUS = "senior_care/robot_status"   # 로봇 응답 결과 앱으로 전송
+BACKEND_URL       = os.getenv("BACKEND_URL", "http://13.238.255.200:8080")
+ELDER_ID          = os.getenv("ELDER_ID", "default_elder")
 
 LISTEN_TIMEOUT    = 3   # 낙상 후 응답 대기 시간 (초)
 CONFIRM_WAIT      = 3   # TTS 재생 후 응답 대기 전 여유 시간 (초)
@@ -174,12 +177,35 @@ def handle_fall(mqtt_client_ref: mqtt.Client) -> None:
 # MQTT
 # ============================================================
 
+def _report_fall_to_backend(action: str, confidence: float) -> None:
+    try:
+        event_type = "lying_down" if action in ("Lying Down",) else "fall_detected"
+        payload = json.dumps({
+            "elder_id":   ELDER_ID,
+            "event_type": event_type,
+            "action":     action,
+            "confidence": confidence,
+            "location":   "거실",
+        }).encode()
+        req = urllib.request.Request(
+            f"{BACKEND_URL}/events/fall",
+            data=payload,
+            headers={"Content-Type": "application/json"},
+            method="POST",
+        )
+        with urllib.request.urlopen(req, timeout=5) as resp:
+            print(f"[Backend] 이벤트 저장 완료: {resp.status}")
+    except Exception as e:
+        print(f"[Backend] 이벤트 저장 실패: {e}")
+
+
 def on_action_message(client_ref, userdata, message):
     global is_handling_fall
 
     try:
         data = json.loads(message.payload.decode())
         action = data.get("action", "")
+        confidence = float(data.get("confidence", 0.0))
     except Exception:
         return
 
@@ -192,11 +218,8 @@ def on_action_message(client_ref, userdata, message):
         is_handling_fall = True
 
     print(f"[MQTT] 낙상 이벤트 수신: {action}")
-    threading.Thread(
-        target=handle_fall,
-        args=(client_ref,),
-        daemon=True,
-    ).start()
+    threading.Thread(target=_report_fall_to_backend, args=(action, confidence), daemon=True).start()
+    threading.Thread(target=handle_fall, args=(client_ref,), daemon=True).start()
 
 
 def setup_mqtt() -> mqtt.Client:
