@@ -123,7 +123,9 @@ def chat(user_message: str) -> str:
 def handle_fall(mqtt_client_ref: mqtt.Client) -> None:
     global is_handling_fall
 
+    print("[handle_fall] 시작 — TTS 호출")
     speak(f"{ELDER_NAME}, 괜찮으세요? 대답해 주세요.")
+    print("[handle_fall] TTS 완료 — 듣기 시작")
     time.sleep(CONFIRM_WAIT)
 
     response = listen(timeout=LISTEN_TIMEOUT)
