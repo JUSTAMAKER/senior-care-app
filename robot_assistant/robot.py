@@ -228,7 +228,7 @@ def conversation_loop() -> None:
             time.sleep(0.5)
             continue
 
-        user_input = listen(timeout=1)
+        user_input = listen(timeout=3)
 
         if user_input is None:
             continue
