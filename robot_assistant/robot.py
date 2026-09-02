@@ -183,7 +183,7 @@ def on_action_message(client_ref, userdata, message):
     except Exception:
         return
 
-    if action not in ("Fall Down", "Lying Down"):
+    if action not in ("Fall Down", "Lying Down", "FALL", "Fall"):
         return
 
     with fall_lock:
